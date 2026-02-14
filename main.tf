@@ -11,8 +11,20 @@ provider "aws" {
   secret_key = data.vault_kv_secret_v2.aws_creds.data["secret_key"]
 }
 
+# 🔥 Automatically fetch latest Amazon Linux 2 AMI
+data "aws_ami" "amazon_linux" {
+  most_recent = true
+
+  owners = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+  }
+}
+
 resource "aws_instance" "demo" {
-  ami           = "ami-0f58b397bc5c1f2e8"
+  ami           = data.aws_ami.amazon_linux.id
   instance_type = "t2.micro"
 
   tags = {
